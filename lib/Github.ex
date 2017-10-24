@@ -1,10 +1,9 @@
 defmodule Github do
-  def get( query \\ "Elixir-lang/Elixir" ) do
-    url( query )
-    |> HTTPoison.get!
-    |> Parse.body
+  def get() do
+    HTTPoison.get!( "https://api.github.com/repos/Elixir-lang/Elixir/issues" )
+    |> body
     |> Poison.decode!
-    |> Parse.title_list
+    |> Enum.map( fn( %{ "title" => title } ) -> title end )
   end
-  def url( query ), do: "https://api.github.com/repos/#{query}/issues"
+  def body( %{ status_code: 200, body: json_body } ), do: json_body
 end

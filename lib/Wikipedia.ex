@@ -1,12 +1,11 @@
 defmodule Wikipedia do
-  def get( query \\ "Elixir" ) do
-    url( query )
-    |> HTTPoison.get!
-    |> Parse.body
+  def get() do
+    HTTPoison.get!("https://ja.wikipedia.org/w/api.php?format=json&action=query&list=search&srsearch=Elixir")
+    |> body
     |> Poison.decode!
     |> dig
-    |> Parse.title_list
+    |> Enum.map( fn( %{ "title" => title } ) -> title end )
   end
-  def url( query ), do: "https://ja.wikipedia.org/w/api.php?format=json&action=query&list=search&srsearch=#{query}"
-  def dig( %{ "query" => %{ "search" => search} } ), do: search
+  def body( %{ status_code: 200, body: json_body } ), do: json_body
+  def dig( %{ "query" => %{ "search" => search } } ), do: search
 end

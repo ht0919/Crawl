@@ -1,11 +1,10 @@
 defmodule Hatena do
-  def get( query \\ "Elixir" ) do
-    url( query )
-    |> HTTPoison.get!
-    |> Parse.body
-    |> String.slice( 1..-3 )
+  def get() do
+    HTTPoison.get!("http://b.hatena.ne.jp/entrylist/json?sort=count&url=Elixir")
+    |> body
+    |> String.slice( 1..-3)
     |> Poison.decode!
-    |> Parse.title_list
+    |> Enum.map( fn( %{ "title" => title } ) -> title end )
   end
-  def url( query ), do: "http://b.hatena.ne.jp/entrylist/json?sort=count&url=#{query}"
+  def body( %{ status_code: 200, body: json_body } ), do: json_body
 end

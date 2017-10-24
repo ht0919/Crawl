@@ -1,10 +1,9 @@
 defmodule Crawl do
-  def get( query \\ "Elixir" ) do
-    url( query )
-    |> HTTPoison.get!
-    |> Parse.body
+  def get() do
+    HTTPoison.get!("https://qiita.com/api/v2/items?query=Elixir")
+    |> body
     |> Poison.decode!
-    |> Parse.title_list
+    |> Enum.map( fn( %{ "title" => title } ) -> title end )
   end
-  def url( query ), do: "https://qiita.com/api/v2/items?query=#{query}"
+  def body( %{ status_code: 200, body: json_body } ), do: json_body
 end
